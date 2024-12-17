@@ -17,6 +17,7 @@ class Manager:
     def __init__(
         self,
         project: str = "test",
+        host: str = "127.0.0.1",
         port: int = 9050,
         grpc_port: int = 9060,
         schema_path: str = "bqem_master_schema.yaml",
@@ -38,7 +39,7 @@ class Manager:
         else:
             raise RuntimeError(f"there is no empty port from {original_port} to {port}")
 
-        self.client = self._make_client(project, port)
+        self.client = self._make_client(project_name=project, host=host, port=port)
 
         prod_client = bigquery.Client(project, credentials=AnonymousCredentials())
 
@@ -54,8 +55,8 @@ class Manager:
         del self.schema_manager
 
     @staticmethod
-    def _make_client(project_name: str, port: int) -> bigquery.Client:
-        client_options = ClientOptions(api_endpoint=f"http://0.0.0.0:{port}")
+    def _make_client(project_name: str, host: str, port: int) -> bigquery.Client:
+        client_options = ClientOptions(api_endpoint=f"http://{host}:{port}")
         client = bigquery.Client(
             project_name,
             client_options=client_options,
